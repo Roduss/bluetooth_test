@@ -91,6 +91,27 @@ class FindDevicesScreenState extends State<FindDevicesScreen>{
 
   FindDevicesScreenState();
 
+
+  @override
+  void initState(){
+    bool isHere = false;
+    ScanResult r;
+    FlutterBlue.instance.startScan(timeout: Duration(seconds: 2));
+    var subscription = FlutterBlue.instance.scanResults.listen((results) {
+      for(r in results){
+        if(r.device.name ==('Nordic_UART')){
+          isHere=true;
+
+        }
+    }
+      if(isHere == true){
+       /// r.device.connect(); Pas fou parce qu'il essaie de se connecer à tous
+        ///Les devices dispos !
+        print("Connected to nordic from init");
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -110,7 +131,24 @@ class FindDevicesScreenState extends State<FindDevicesScreen>{
                 builder: (c, snapshot) => Column(
                   children: snapshot.data
                       .map((d) => ListTile(
-                    title: Text(d.name),
+                    title: Text((() { // A placer quand la liste est crée apparemment, parce que ça s'éxécute quand je cliques sur Nordic.
+                      /*if(d.name == 'Nordic_UART'){
+                        print("Found a nordic !");
+                        d.connect();
+                        Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    DeviceScreen(d)));
+                      }
+                      else{
+                        print("Nordic not found");
+                      }*/
+                      ///Le fait de mettre un navigator empeche de revenir sur la page
+                      ///de connexion, ça sera peut etre intérréssant !
+                      return d.name;
+                    } ())),
+
+
                     subtitle: Text(d.id.toString()),
                     trailing: StreamBuilder<BluetoothDeviceState>(
                       stream: d.state,
@@ -126,6 +164,8 @@ class FindDevicesScreenState extends State<FindDevicesScreen>{
                                         DeviceScreen(d))),
                           );
                         }
+
+
                         return Text(snapshot.data.toString());
                       },
                     ),
@@ -143,7 +183,7 @@ class FindDevicesScreenState extends State<FindDevicesScreen>{
                       result: r,
                       onTap: () => Navigator.of(context)
                           .push(MaterialPageRoute(builder: (context) {
-                        r.device.connect();
+                        r.device.connect(autoConnect: true);
                         return DeviceScreen(r.device);
                       })),
                     ),
@@ -206,18 +246,16 @@ DeviceScreenState(this.device);
   }
 
 
-  List<int> _converttolistint(String _data){
-    print("num 0 : ${_data[0]}");
-    print("num1 : ${_data[1]}");
-    print("num1 : ${_data[2]}");
-    print("num1 : ${_data[3]}");
-    return[int.parse(_data[0]),
-      int.parse(_data[1]),
-      int.parse(_data[2]),
-      int.parse(_data[3])
-    ];
-  }
+@override //S'éxécute au lancement de la page
+void initState() {
+device.discoverServices();
 
+}
+
+@override
+void dispose(){ //A voir si on a besoin de fermer des streams ici par exemple
+  super.dispose();
+}
   //Construction des services avec boutons quand t'es connecte.
   List<Widget> _buildServiceTiles(List<BluetoothService> services) {
     return services
@@ -237,7 +275,7 @@ DeviceScreenState(this.device);
               await c.setNotifyValue(!c.isNotifying);
               await c.read();
             },
-            descriptorTiles: c.descriptors //Descripteurs, qui n'ont pas l'air d'etre utilisés
+           /* descriptorTiles: c.descriptors //Descripteurs, qui n'ont pas l'air d'etre utilisés
                 .map(
                   (d) => DescriptorTile(
                 descriptor: d,
@@ -245,7 +283,7 @@ DeviceScreenState(this.device);
                 onWritePressed: () => d.write(_getRandomBytes()),
               ),
             )
-                .toList(),
+                .toList(),*/
           ),
         )
             .toList(),
@@ -274,7 +312,7 @@ DeviceScreenState(this.device);
                   text = 'DISCONNECT';
                   break;
                 case BluetoothDeviceState.disconnected:
-                  onPressed = () => device.connect();
+                  onPressed = () => device.connect(autoConnect: true); //A voir si ça fait connexion automatique ou pas
                   text = 'CONNECT';
                   break;
                 default:

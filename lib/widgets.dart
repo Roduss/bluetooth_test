@@ -11,6 +11,11 @@ class ScanResultTile extends StatelessWidget {
   final ScanResult result;
   final VoidCallback onTap;
 
+  @override
+  void initState(){
+
+  }
+
   Widget _buildTitle(BuildContext context) {
     if (result.device.name.length > 0) {
       return Column(
@@ -120,7 +125,7 @@ class ScanResultTile extends StatelessWidget {
   }
 }
 
-class ServiceTile extends StatelessWidget {
+class ServiceTile extends StatelessWidget {// Page pour une connexion (ex : nordic uart)
   final BluetoothService service;
   final List<CharacteristicTile> characteristicTiles;
 
@@ -155,21 +160,87 @@ class ServiceTile extends StatelessWidget {
   }
 }
 
-class CharacteristicTile extends StatelessWidget { //La classe avec les boutons d'écriture/Notification
+class CharacteristicTile extends StatefulWidget {
+  //La classe avec les boutons d'écriture/Notification
   final BluetoothCharacteristic characteristic;
-  final List<DescriptorTile> descriptorTiles;
+  //final List<DescriptorTile> descriptorTiles;
+  final BluetoothDevice device;
   final VoidCallback onReadPressed;
   final VoidCallback onWritePressed;
   final VoidCallback onNotificationPressed;
 
-  const CharacteristicTile(
-      {Key key,
-        this.characteristic,
-        this.descriptorTiles,
-        this.onReadPressed,
-        this.onWritePressed,
-        this.onNotificationPressed})
+  const CharacteristicTile({Key key,
+    this.characteristic,
+    this.device,
+    this.onReadPressed,
+    this.onWritePressed,
+    this.onNotificationPressed})
       : super(key: key);
+
+  @override
+  CharacteristicTitleState createState(){
+    return CharacteristicTitleState(this.characteristic,this.device, this.onReadPressed,this.onWritePressed,this.onNotificationPressed);
+  }
+
+}
+
+class CharacteristicTitleState extends State<CharacteristicTile>{
+  final BluetoothCharacteristic characteristic;
+  final BluetoothDevice device;
+  final VoidCallback onReadPressed;
+  final VoidCallback onWritePressed;
+  final VoidCallback onNotificationPressed;
+
+  final valnotif = ValueNotifier(0);
+
+  CharacteristicTitleState(this.characteristic,this.device, this.onReadPressed,this.onWritePressed,this.onNotificationPressed);
+
+
+  /*changesOnField(){
+    characteristic.value.listen((value) {
+      String _val = value.toString();
+      String _newcode="";
+      int _code =0;
+      print("Val init de la longueur de val: ${_val.length}");
+      if(_val.length >2){
+        for(int i=0; i<_val.length/4;i++){
+
+          //print("Val $i : ${value[i]}");
+          _code = value[i] -48;
+
+          _newcode = _newcode + _code.toString();
+
+        }
+        print("Equivalent : $_newcode");
+      }
+    });
+    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
+  }*/
+
+  @override
+  void initState(){
+    //device.discoverServices();
+    characteristic.setNotifyValue(true);//Dit qu'on active les notifs
+
+    characteristic.value.listen((value) {
+      String _val = value.toString();
+      String _newcode="";
+      int _code =0;
+      print("Val init de la longueur de val: ${_val.length}");
+      if(_val.length >2){
+        for(int i=0; i<_val.length/4;i++){
+
+          //print("Val $i : ${value[i]}");
+          _code = value[i] -48;
+
+          _newcode = _newcode + _code.toString();
+
+        }
+        print("Equivalent : $_newcode");
+      }
+    });
+    //valnotif.addListener(changesOnField); A remettre si tu veux utiliser les changements
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -178,130 +249,25 @@ class CharacteristicTile extends StatelessWidget { //La classe avec les boutons 
       initialData: characteristic.lastValue,
       builder: (c, snapshot) {
         final value = snapshot.data;
-        return ExpansionTile(
-          title: ListTile(
-            title: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text('Characteristic'),
-                Text(
-                    '0x${characteristic.uuid.toString().toUpperCase().substring(4, 8)}',
-                    style: Theme.of(context).textTheme.body1.copyWith(
-                        color: Theme.of(context).textTheme.caption.color))
-              ],
-            ),
-            subtitle: Text(value.toString()),
-            //Les données reçues sont écrites la.
-            contentPadding: EdgeInsets.all(0.0),
-          ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: <Widget>[
-              IconButton(
-                icon: Icon(
-                  Icons.file_download,
-                  color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-                ),
-                onPressed: onReadPressed,
-              ),
-              IconButton(
-                icon: Icon(Icons.file_upload,
-                    color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
-                onPressed: onWritePressed,
-              ),
-              IconButton(
-                icon: Icon(
-                    characteristic.isNotifying
-                        ? Icons.sync_disabled
-                        : Icons.sync,
-                    color: Theme.of(context).iconTheme.color.withOpacity(0.5)),
-                onPressed: onNotificationPressed,
-              )
-            ],
-          ),
-          children: descriptorTiles,
-        );
-      },
-    );
-  }
-}
+        return
+          Text((() {
+            String _val = value.toString();
+            String _newcode = "";
+            int _code = 0;
+            print("Val de la longueur de val: ${_val.length}");
+            if (_val.length > 2) {
+              for (int i = 0; i < _val.length / 4; i++) {
+                //print("Val $i : ${value[i]}");
+                _code = value[i] - 48;
 
-class DescriptorTile extends StatelessWidget {
-  //Ne se construit que lorsqu'il y a des descriptors ! Pareil pour les characteristics !
-  //C'est meme écrit descriptor dessus plutot que characteristics ;)
-  final BluetoothDescriptor descriptor;
-  final VoidCallback onReadPressed;
-  final VoidCallback onWritePressed;
+                _newcode = _newcode + _code.toString();
+              }
+              print("Equivalent ds code : $_newcode");
+            }
+            return _newcode;
+          })());
 
-  const DescriptorTile(
-      {Key key, this.descriptor, this.onReadPressed, this.onWritePressed})
-      : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return ListTile(
-      title: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: <Widget>[
-          Text('Descriptor'),
-          Text('0x${descriptor.uuid.toString().toUpperCase().substring(4, 8)}',
-              style: Theme.of(context)
-                  .textTheme
-                  .body1
-                  .copyWith(color: Theme.of(context).textTheme.caption.color))
-        ],
-      ),
-      subtitle: StreamBuilder<List<int>>(
-        stream: descriptor.value,
-        initialData: descriptor.lastValue,
-        builder: (c, snapshot) => Text(snapshot.data.toString()),
-      ),
-      trailing: Row(
-        mainAxisSize: MainAxisSize.min,
-        children: <Widget>[
-          IconButton(
-            icon: Icon(
-              Icons.file_download,
-              color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-            ),
-            onPressed: onReadPressed,
-          ),
-          IconButton(
-            icon: Icon(
-              Icons.file_upload,
-              color: Theme.of(context).iconTheme.color.withOpacity(0.5),
-            ),
-            onPressed: onWritePressed,
-          )
-        ],
-      ),
-    );
-  }
-}
-
-//S'éxécute quand il n'y a pas de bluetooth activé, pas sur que ça soit encore utilisé !
-//Car on fait un print dans le main de la meme phrase
-class AdapterStateTile extends StatelessWidget {
-  const AdapterStateTile({Key key, @required this.state}) : super(key: key);
-
-  final BluetoothState state;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: Colors.redAccent,
-      child: ListTile(
-        title: Text(
-          'Bluetooth adapter is ${state.toString().substring(15)}',
-          style: Theme.of(context).primaryTextTheme.subhead,
-        ),
-        trailing: Icon(
-          Icons.error,
-          color: Theme.of(context).primaryTextTheme.subhead.color,
-        ),
-      ),
+      }
     );
   }
 }
