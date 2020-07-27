@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\tollinet\\Android_apps\\bluetooth_test\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-hdpi-v4\\values-hdpi-v4.xml",
+            "outputFile": "D:\\Esme\\5_eme_annee\\Astek\\Taf\\bluetooth_test\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-hdpi-v4\\values-hdpi-v4.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\tollinet\\.gradle\\caches\\transforms-2\\files-2.1\\d8e69336e21c6a428e8a9e9d99518477\\appcompat-1.0.0\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
+                    "source": "C:\\Users\\Titou\\.gradle\\caches\\transforms-2\\files-2.1\\d8e69336e21c6a428e8a9e9d99518477\\appcompat-1.0.0\\res\\values-hdpi-v4\\values-hdpi-v4.xml",
                     "from": {
                         "startLines": "2",
                         "startColumns": "4",

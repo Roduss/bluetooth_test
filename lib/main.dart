@@ -97,7 +97,7 @@ class FindDevicesScreenState extends State<FindDevicesScreen>{
     bool isHere = false;
     ScanResult r;
     FlutterBlue.instance.startScan(timeout: Duration(seconds: 2));
-    var subscription = FlutterBlue.instance.scanResults.listen((results) {
+    /*var subscription = FlutterBlue.instance.scanResults.listen((results) {
       for(r in results){
         if(r.device.name ==('Nordic_UART')){
           isHere=true;
@@ -109,7 +109,7 @@ class FindDevicesScreenState extends State<FindDevicesScreen>{
         ///Les devices dispos !
         print("Connected to nordic from init");
       }
-    });
+    });*/
   }
 
   @override
@@ -232,8 +232,9 @@ class DeviceScreen extends StatefulWidget {
 class DeviceScreenState extends State<DeviceScreen>{
   final BluetoothDevice device;
   String mydata="";
+  BluetoothCharacteristic characteristic;
 
-DeviceScreenState(this.device);
+  DeviceScreenState(this.device);
 
   List<int> _getRandomBytes() { //Permet de choisir ce qu'on envoie a la carte.
     final math = Random();
@@ -249,7 +250,8 @@ DeviceScreenState(this.device);
 @override //S'éxécute au lancement de la page
 void initState() {
 device.discoverServices();
-
+//characteristic.setNotifyValue(true);
+super.initState();
 }
 
 @override
@@ -262,28 +264,11 @@ void dispose(){ //A voir si on a besoin de fermer des streams ici par exemple
         .map(
           (s) => ServiceTile(
         service: s,
+
         characteristicTiles: s.characteristics
             .map(
-              (c) => CharacteristicTile(
+              (c) => CharacteristicTile( //Quand tu cliques ça éxécute ça !
             characteristic: c,
-            onReadPressed: () => c.read(), //Quand t'appuies sur le premier bouton
-            onWritePressed: () async {//Sur le deuxième
-              await c.write(_getRandomBytes(), withoutResponse: true);
-              await c.read();
-            },
-            onNotificationPressed: () async {//Sur le 3 eme, active notification auto.
-              await c.setNotifyValue(!c.isNotifying);
-              await c.read();
-            },
-           /* descriptorTiles: c.descriptors //Descripteurs, qui n'ont pas l'air d'etre utilisés
-                .map(
-                  (d) => DescriptorTile(
-                descriptor: d,
-                onReadPressed: () => d.read(),
-                onWritePressed: () => d.write(_getRandomBytes()),
-              ),
-            )
-                .toList(),*/
           ),
         )
             .toList(),

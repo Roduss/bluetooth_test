@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "C:\\Users\\tollinet\\Android_apps\\bluetooth_test\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v23\\values-v23.xml",
+            "outputFile": "D:\\Esme\\5_eme_annee\\Astek\\Taf\\bluetooth_test\\build\\app\\intermediates\\incremental\\mergeDebugResources\\merged.dir\\values-v23\\values-v23.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\tollinet\\.gradle\\caches\\transforms-2\\files-2.1\\d8e69336e21c6a428e8a9e9d99518477\\appcompat-1.0.0\\res\\values-v23\\values-v23.xml",
+                    "source": "C:\\Users\\Titou\\.gradle\\caches\\transforms-2\\files-2.1\\d8e69336e21c6a428e8a9e9d99518477\\appcompat-1.0.0\\res\\values-v23\\values-v23.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,19,32,33,34,35,36",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4",

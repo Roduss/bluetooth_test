@@ -125,12 +125,36 @@ class ScanResultTile extends StatelessWidget {
   }
 }
 
-class ServiceTile extends StatelessWidget {// Page pour une connexion (ex : nordic uart)
+class ServiceTile extends StatefulWidget {
+// Page pour une connexion (ex : nordic uart)
   final BluetoothService service;
+  final BluetoothCharacteristic characteristic;
   final List<CharacteristicTile> characteristicTiles;
 
-  const ServiceTile({Key key, this.service, this.characteristicTiles})
+  const ServiceTile({Key key, this.service, this.characteristic, this.characteristicTiles})
       : super(key: key);
+
+  @override
+  ServiceTileState createState() {
+    return ServiceTileState(this.service,this.characteristic, this.characteristicTiles);
+  }
+}
+
+
+class ServiceTileState extends State<ServiceTile>{
+
+  final BluetoothService service;
+  final List<CharacteristicTile> characteristicTiles;
+  final BluetoothCharacteristic characteristic;
+
+  ServiceTileState(this.service, this.characteristic, this.characteristicTiles);
+
+  @override
+  void initState(){
+    //device.discoverServices();
+    characteristic.setNotifyValue(true);//Dit qu'on active les notifs
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -191,56 +215,14 @@ class CharacteristicTitleState extends State<CharacteristicTile>{
   final VoidCallback onWritePressed;
   final VoidCallback onNotificationPressed;
 
-  final valnotif = ValueNotifier(0);
+
 
   CharacteristicTitleState(this.characteristic,this.device, this.onReadPressed,this.onWritePressed,this.onNotificationPressed);
 
 
-  /*changesOnField(){
-    characteristic.value.listen((value) {
-      String _val = value.toString();
-      String _newcode="";
-      int _code =0;
-      print("Val init de la longueur de val: ${_val.length}");
-      if(_val.length >2){
-        for(int i=0; i<_val.length/4;i++){
 
-          //print("Val $i : ${value[i]}");
-          _code = value[i] -48;
 
-          _newcode = _newcode + _code.toString();
 
-        }
-        print("Equivalent : $_newcode");
-      }
-    });
-    WidgetsBinding.instance.addPostFrameCallback((_) => setState(() {}));
-  }*/
-
-  @override
-  void initState(){
-    //device.discoverServices();
-    characteristic.setNotifyValue(true);//Dit qu'on active les notifs
-
-    characteristic.value.listen((value) {
-      String _val = value.toString();
-      String _newcode="";
-      int _code =0;
-      print("Val init de la longueur de val: ${_val.length}");
-      if(_val.length >2){
-        for(int i=0; i<_val.length/4;i++){
-
-          //print("Val $i : ${value[i]}");
-          _code = value[i] -48;
-
-          _newcode = _newcode + _code.toString();
-
-        }
-        print("Equivalent : $_newcode");
-      }
-    });
-    //valnotif.addListener(changesOnField); A remettre si tu veux utiliser les changements
-  }
 
   @override
   Widget build(BuildContext context) {

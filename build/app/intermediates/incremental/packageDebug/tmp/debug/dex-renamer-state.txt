@@ -1,4 +1,4 @@
-#Thu Jul 23 16:14:29 CEST 2020
-base.0=C\:\\Users\\tollinet\\Android_apps\\bluetooth_test\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
+#Mon Jul 27 15:23:04 CEST 2020
+base.0=D\:\\Esme\\5_eme_annee\\Astek\\Taf\\bluetooth_test\\build\\app\\intermediates\\dex\\debug\\mergeDexDebug\\out\\classes.dex
 path.0=classes.dex
 renamed.0=classes.dex
